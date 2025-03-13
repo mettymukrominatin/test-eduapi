@@ -23,3 +23,30 @@
 //
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
+
+Cypress.Commands.add('LoginViaAPI', () => {    
+    // Cari user dengan fixtures
+    cy.fixture('postAPI').then(userapi => {
+        // Akses URL
+        const apiUrl = 'https://reqres.in/api';
+
+        // Req login ke API
+        cy.request("POST", `${apiUrl}/login`, {
+            email: userapi.email,
+            password: userapi.password,
+          }).then((response) => {
+            // Validasi req berhasil
+            expect(response.status).to.eq(200);
+
+            // Simpan cookie dalam token
+            cy.setCookie('authToken', response.body.token);
+            
+            // Baca log kalau token tersimpan
+            cy.log("Token:", response.body.token);
+
+            // cy.setCookie('sessionId', response.body.sessionId)
+            // cy.setCookie('userId', response.body.userId)
+            // cy.setCookie('userName', response.body.userName)
+        })
+    })
+})
